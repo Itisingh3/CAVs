@@ -1,0 +1,10 @@
+{
+  "variant": "baseline",
+  "seed": 1001,
+  "density": 12,
+  "rounds": 12,
+  "engine": "lightweight-equivalent-not-veins",
+  "python": "3.12.13 (main, Aug  7 2026, 02:26:41) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "warning": "Development harness only; final paper evaluation requires documented SUMO/Veins/OMNeT++ integration."
+}

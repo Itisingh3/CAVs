@@ -1,0 +1,21 @@
+(* Session-key secrecy equivalence for spec v1.0.0's ephemeral KEM abstraction.
+   Left side exports the derived key; right side exports a fresh random key.
+   This intentionally isolated experiment establishes the KEM/KDF core only.
+   It must be rerun with the complete credential and replay-cache processes
+   before a paper claim is made. *)
+free c: channel.
+free i_sk, r_sk: bitstring [private].
+fun pk(bitstring): bitstring.
+fun sign(bitstring, bitstring): bitstring.
+reduc forall m:bitstring, sk:bitstring; checksign(sign(m, sk), pk(sk)) = m.
+fun kemenc(bitstring, bitstring): bitstring.
+reduc forall esk:bitstring, ss:bitstring; kemdec(kemenc(pk(esk), ss), esk) = ss.
+fun kdf(bitstring, bitstring): bitstring.
+
+process
+  new sid:bitstring; new esk:bitstring; new ss:bitstring;
+  let epk = pk(esk) in
+  out(c, (sid, epk, sign((sid,epk), i_sk)));
+  let ct = kemenc(epk, ss) in
+  new random_key:bitstring;
+  out(c, (ct, choice[kdf(ss,sid), random_key]))
