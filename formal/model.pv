@@ -1,0 +1,44 @@
+(* ProVerif symbolic model for the cryptographic core of spec v1.0.0.
+   Credentials, timestamps, and replay caches are checked by the executable protocol;
+   this model abstracts TA-validated public keys and focuses on the signed ephemeral-KEM flow. *)
+free c: channel.
+free i_sk, r_sk: bitstring [private].
+
+fun pk(bitstring): bitstring.
+fun sign(bitstring, bitstring): bitstring.
+reduc forall m:bitstring, sk:bitstring; checksign(sign(m, sk), pk(sk)) = m.
+fun kemenc(bitstring, bitstring): bitstring.
+reduc forall esk:bitstring, ss:bitstring; kemdec(kemenc(pk(esk), ss), esk) = ss.
+fun kdf(bitstring, bitstring): bitstring.
+
+event Initiated(bitstring).
+event Responded(bitstring).
+event AcceptedI(bitstring, bitstring).
+event AcceptedR(bitstring, bitstring).
+
+let Initiator =
+  new sid: bitstring; new esk: bitstring;
+  let epk = pk(esk) in
+  event Initiated(sid);
+  out(c, (sid, epk, sign((sid, epk), i_sk)));
+  in(c, (sid2:bitstring, ct:bitstring, rsig:bitstring));
+  let (=sid, ct2:bitstring) = checksign(rsig, pk(r_sk)) in
+  let ss = kemdec(ct2, esk) in
+  event AcceptedI(sid, kdf(ss, sid)).
+
+let Responder =
+  in(c, (sid:bitstring, epk:bitstring, isig:bitstring));
+  let (=sid, =epk) = checksign(isig, pk(i_sk)) in
+  event Responded(sid);
+  new ss: bitstring;
+  let ct = kemenc(epk, ss) in
+  out(c, (sid, ct, sign((sid, ct), r_sk)));
+  event AcceptedR(sid, kdf(ss, sid)).
+
+query sid:bitstring, key:bitstring; event(AcceptedI(sid, key)) ==> event(Responded(sid)).
+query sid:bitstring, key:bitstring; event(AcceptedR(sid, key)) ==> event(Initiated(sid)).
+(* Session-key secrecy is checked with the observational-equivalence model in
+   formal/secrecy_equivalence.pv. ProVerif correspondence syntax cannot attach
+   a conditional attacker query to a newly generated session key. *)
+
+process (!Initiator | !Responder)

@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cav-pqc-agsbft"
+version = "0.1.0"
+description = "Reproducible reference implementation for crypto-agile ML-predictive AGS-PBFT"
+requires-python = ">=3.10"
+dependencies = ["liboqs-python>=0.10"]
+
+[tool.setuptools]
+packages = ["crypto", "protocol", "consensus", "ml", "sim", "analysis"]
