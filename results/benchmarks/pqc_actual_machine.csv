@@ -1,0 +1,7 @@
+algorithm,operation,mean_ms,bytes
+ML-KEM-768,keygen,10.763775,pk=1184;sk=2400
+ML-KEM-768,encap,0.61249,ct=1088
+ML-KEM-768,decap,0.68275,ss=32
+ML-DSA-65,keygen,1.21768,pk=1952;sk=4032
+ML-DSA-65,sign,5.859975,sig=3309
+ML-DSA-65,verify,1.660305,
