@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="780" viewBox="0 0 1180 780" role="img" aria-labelledby="title desc">
+  <title id="title">ML-adaptive AGS-PBFT architecture</title>
+  <desc id="desc">A flow diagram of network observations entering a feature vector, online logistic reliability predictor, decision engine, consensus group selection and group-size control with a confidence-based fallback to the best static policy.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L10,3 L0,6 Z" fill="#31526E"/></marker>
+    <marker id="arrow-alert" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L10,3 L0,6 Z" fill="#B45309"/></marker>
+    <style>
+      .heading{font:700 25px Arial,sans-serif;fill:#102A43}.subtitle{font:400 15px Arial,sans-serif;fill:#486581}.step{font:700 15px Arial,sans-serif;fill:#102A43}.body{font:400 13px Arial,sans-serif;fill:#243B53}.small{font:400 12px Arial,sans-serif;fill:#486581}.label{font:700 13px Arial,sans-serif;fill:#102A43}.white{font:700 14px Arial,sans-serif;fill:#FFF}
+    </style>
+  </defs>
+  <rect width="1180" height="780" fill="#FFFFFF"/>
+  <text x="590" y="42" text-anchor="middle" class="heading">ML-Adaptive AGS-PBFT Grouping with Confidence-Guarded Static Fallback</text>
+  <text x="590" y="68" text-anchor="middle" class="subtitle">A lightweight online logistic model updates consensus membership and group size while preserving a validated static safety path.</text>
+  <rect x="68" y="104" width="1044" height="92" rx="8" fill="#F3F7FC" stroke="#B8CCE0" stroke-width="1.5"/>
+  <text x="92" y="132" class="step">1. Network and consensus observations per evaluation window</text>
+  <g class="body"><text x="105" y="160">• agreement outcome</text><text x="320" y="160">• round-trip time</text><text x="505" y="160">• packet delivery ratio</text><text x="725" y="160">• mobility / link quality</text><text x="943" y="160">• fault history</text></g>
+  <line x1="590" y1="196" x2="590" y2="230" stroke="#31526E" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="230" y="232" width="720" height="80" rx="8" fill="#EAF2FB" stroke="#4C86B8" stroke-width="1.5"/>
+  <text x="590" y="260" text-anchor="middle" class="step">2. Per-node normalized feature vector</text>
+  <text x="590" y="285" text-anchor="middle" class="body">x<tspan baseline-shift="sub" font-size="10">i</tspan> = [agreement rate, normalized RTT, PDR, link quality, score trend, recent fault rate]</text>
+  <line x1="590" y1="312" x2="590" y2="346" stroke="#31526E" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="300" y="348" width="580" height="92" rx="8" fill="#E8F7F5" stroke="#328F88" stroke-width="1.5"/>
+  <text x="590" y="378" text-anchor="middle" class="step">3. Online logistic reliability predictor</text>
+  <text x="590" y="402" text-anchor="middle" class="body">p<tspan baseline-shift="sub" font-size="10">i</tspan> = P(node i is reliable in the next window | x<tspan baseline-shift="sub" font-size="10">i</tspan>)</text>
+  <text x="590" y="422" text-anchor="middle" class="small">Incremental update after outcomes are observed; no deep-learning dependency.</text>
+  <line x1="590" y1="440" x2="590" y2="474" stroke="#31526E" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="242" y="476" width="696" height="80" rx="8" fill="#F4F0FB" stroke="#8669B4" stroke-width="1.5"/>
+  <text x="590" y="505" text-anchor="middle" class="step">4. Reliability and congestion decision engine</text>
+  <text x="590" y="530" text-anchor="middle" class="body">Rank by p<tspan baseline-shift="sub" font-size="10">i</tspan>; derive aggregate congestion from PDR and RTT; enforce n ≥ 3f + 1.</text>
+  <line x1="448" y1="556" x2="287" y2="606" stroke="#31526E" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="732" y1="556" x2="893" y2="606" stroke="#31526E" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="89" y="608" width="396" height="91" rx="8" fill="#EFF7EC" stroke="#68A06E" stroke-width="1.5"/>
+  <text x="287" y="638" text-anchor="middle" class="step">5a. Consensus-group selection</text>
+  <text x="287" y="661" text-anchor="middle" class="body">Select highest-reliability eligible nodes</text>
+  <text x="287" y="681" text-anchor="middle" class="small">Authenticated ML-DSA votes remain mandatory.</text>
+  <rect x="695" y="608" width="396" height="91" rx="8" fill="#EFF7EC" stroke="#68A06E" stroke-width="1.5"/>
+  <text x="893" y="638" text-anchor="middle" class="step">5b. Adaptive group-size policy</text>
+  <text x="893" y="661" text-anchor="middle" class="body">Increase size when load/congestion warrants it</text>
+  <text x="893" y="681" text-anchor="middle" class="small">Reduce overhead only within PBFT safety bounds.</text>
+  <path d="M242 516 C130 516,125 638,163 704" fill="none" stroke="#B45309" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow-alert)"/>
+  <rect x="321" y="712" width="538" height="48" rx="7" fill="#C96E11"/>
+  <text x="590" y="733" text-anchor="middle" class="white">Confidence guard: low confidence, invalid features, or &lt;10 labels → best ablated static policy</text>
+  <text x="590" y="751" text-anchor="middle" class="white">Every fallback is logged for robustness analysis.</text>
+</svg>
