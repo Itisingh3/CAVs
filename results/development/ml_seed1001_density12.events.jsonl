@@ -1,0 +1,175 @@
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-000", "round_id": "0", "score": 101.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-001", "round_id": "0", "score": 101.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-002", "round_id": "0", "score": 101.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-003", "round_id": "0", "score": 101.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-004", "round_id": "0", "score": 101.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-005", "round_id": "0", "score": 101.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-006", "round_id": "0", "score": 101.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-007", "round_id": "0", "score": 101.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-008", "round_id": "0", "score": 101.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-009", "round_id": "0", "score": 101.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-010", "round_id": "0", "score": 101.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-011", "round_id": "0", "score": 101.0}
+{"density": 12, "event": "network", "latency_ms": 59.64907917502029, "pdr": 0.8354305205699308, "round_id": "0"}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-000", "round_id": "1", "score": 102.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-001", "round_id": "1", "score": 102.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-002", "round_id": "1", "score": 102.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-003", "round_id": "1", "score": 102.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-004", "round_id": "1", "score": 102.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-005", "round_id": "1", "score": 102.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-006", "round_id": "1", "score": 102.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-007", "round_id": "1", "score": 102.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-008", "round_id": "1", "score": 102.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-009", "round_id": "1", "score": 102.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-010", "round_id": "1", "score": 102.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-011", "round_id": "1", "score": 102.0}
+{"density": 12, "event": "network", "latency_ms": 60.98244792586395, "pdr": 0.8038544738911443, "round_id": "1"}
+{"agreed": false, "delta": -5.0, "event": "score_update", "node_id": "cav-000", "round_id": "2", "score": 97.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-001", "round_id": "2", "score": 103.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-002", "round_id": "2", "score": 103.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-003", "round_id": "2", "score": 103.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-004", "round_id": "2", "score": 103.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-005", "round_id": "2", "score": 103.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-006", "round_id": "2", "score": 103.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-007", "round_id": "2", "score": 103.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-008", "round_id": "2", "score": 103.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-009", "round_id": "2", "score": 103.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-010", "round_id": "2", "score": 103.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-011", "round_id": "2", "score": 103.0}
+{"density": 12, "event": "network", "latency_ms": 59.45024849094052, "pdr": 0.8102111049850428, "round_id": "2"}
+{"agreed": false, "delta": -5.0, "event": "score_update", "node_id": "cav-000", "round_id": "3", "score": 92.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-001", "round_id": "3", "score": 104.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-002", "round_id": "3", "score": 104.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-003", "round_id": "3", "score": 104.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-004", "round_id": "3", "score": 104.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-005", "round_id": "3", "score": 104.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-006", "round_id": "3", "score": 104.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-007", "round_id": "3", "score": 104.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-008", "round_id": "3", "score": 104.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-009", "round_id": "3", "score": 104.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-010", "round_id": "3", "score": 104.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-011", "round_id": "3", "score": 104.0}
+{"density": 12, "event": "network", "latency_ms": 59.45120924759099, "pdr": 0.8263611689164402, "round_id": "3"}
+{"agreed": false, "delta": -5.0, "event": "score_update", "node_id": "cav-000", "round_id": "4", "score": 87.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-001", "round_id": "4", "score": 105.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-002", "round_id": "4", "score": 105.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-003", "round_id": "4", "score": 105.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-004", "round_id": "4", "score": 105.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-005", "round_id": "4", "score": 105.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-006", "round_id": "4", "score": 105.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-007", "round_id": "4", "score": 105.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-008", "round_id": "4", "score": 105.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-009", "round_id": "4", "score": 105.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-010", "round_id": "4", "score": 105.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-011", "round_id": "4", "score": 105.0}
+{"density": 12, "event": "network", "latency_ms": 62.478121202735664, "pdr": 0.8344655299316915, "round_id": "4"}
+{"agreed": false, "delta": -5.0, "event": "score_update", "node_id": "cav-000", "round_id": "5", "score": 82.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-001", "round_id": "5", "score": 106.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-002", "round_id": "5", "score": 106.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-003", "round_id": "5", "score": 106.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-004", "round_id": "5", "score": 106.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-005", "round_id": "5", "score": 106.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-006", "round_id": "5", "score": 106.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-007", "round_id": "5", "score": 106.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-008", "round_id": "5", "score": 106.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-009", "round_id": "5", "score": 106.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-010", "round_id": "5", "score": 106.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-011", "round_id": "5", "score": 106.0}
+{"density": 12, "event": "network", "latency_ms": 57.23191024845168, "pdr": 0.803881612209604, "round_id": "5"}
+{"agreed": false, "delta": -5.0, "event": "score_update", "node_id": "cav-000", "round_id": "6", "score": 77.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-001", "round_id": "6", "score": 107.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-002", "round_id": "6", "score": 107.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-003", "round_id": "6", "score": 107.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-004", "round_id": "6", "score": 107.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-005", "round_id": "6", "score": 107.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-006", "round_id": "6", "score": 107.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-007", "round_id": "6", "score": 107.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-008", "round_id": "6", "score": 107.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-009", "round_id": "6", "score": 107.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-010", "round_id": "6", "score": 107.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-011", "round_id": "6", "score": 107.0}
+{"density": 12, "event": "network", "latency_ms": 60.175198928371366, "pdr": 0.8676982647747485, "round_id": "6"}
+{"agreed": false, "delta": -5.0, "event": "score_update", "node_id": "cav-000", "round_id": "7", "score": 72.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-001", "round_id": "7", "score": 108.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-002", "round_id": "7", "score": 108.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-003", "round_id": "7", "score": 108.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-004", "round_id": "7", "score": 108.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-005", "round_id": "7", "score": 108.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-006", "round_id": "7", "score": 108.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-007", "round_id": "7", "score": 108.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-008", "round_id": "7", "score": 108.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-009", "round_id": "7", "score": 108.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-010", "round_id": "7", "score": 108.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-011", "round_id": "7", "score": 108.0}
+{"density": 12, "event": "network", "latency_ms": 62.39353930756497, "pdr": 0.8667861526630022, "round_id": "7"}
+{"agreed": false, "delta": -5.0, "event": "score_update", "node_id": "cav-000", "round_id": "8", "score": 67.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-001", "round_id": "8", "score": 109.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-002", "round_id": "8", "score": 109.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-003", "round_id": "8", "score": 109.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-004", "round_id": "8", "score": 109.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-005", "round_id": "8", "score": 109.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-006", "round_id": "8", "score": 109.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-007", "round_id": "8", "score": 109.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-008", "round_id": "8", "score": 109.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-009", "round_id": "8", "score": 109.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-010", "round_id": "8", "score": 109.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-011", "round_id": "8", "score": 109.0}
+{"density": 12, "event": "network", "latency_ms": 62.10187384821738, "pdr": 0.8090389800329191, "round_id": "8"}
+{"agreed": false, "delta": -5.0, "event": "score_update", "node_id": "cav-000", "round_id": "9", "score": 62.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-001", "round_id": "9", "score": 110.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-002", "round_id": "9", "score": 110.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-003", "round_id": "9", "score": 110.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-004", "round_id": "9", "score": 110.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-005", "round_id": "9", "score": 110.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-006", "round_id": "9", "score": 110.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-007", "round_id": "9", "score": 110.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-008", "round_id": "9", "score": 110.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-009", "round_id": "9", "score": 110.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-010", "round_id": "9", "score": 110.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-011", "round_id": "9", "score": 110.0}
+{"density": 12, "event": "network", "latency_ms": 56.58601854815422, "pdr": 0.8524031009858667, "round_id": "9"}
+{"event": "group_transition", "from": "consensus", "node_id": "cav-000", "reliability": 0.9096332232426079, "round_id": "9", "score": 62.0, "to": "candidate"}
+{"event": "group_transition", "from": "consensus", "node_id": "cav-002", "reliability": 0.9295173397641399, "round_id": "9", "score": 110.0, "to": "candidate"}
+{"event": "group_transition", "from": "consensus", "node_id": "cav-005", "reliability": 0.9309005509619649, "round_id": "9", "score": 110.0, "to": "candidate"}
+{"event": "group_transition", "from": "candidate", "node_id": "cav-007", "reliability": 0.9578475343372439, "round_id": "9", "score": 110.0, "to": "consensus"}
+{"event": "group_transition", "from": "candidate", "node_id": "cav-008", "reliability": 0.9412032338023545, "round_id": "9", "score": 110.0, "to": "consensus"}
+{"event": "group_transition", "from": "candidate", "node_id": "cav-011", "reliability": 0.9497626739822173, "round_id": "9", "score": 110.0, "to": "consensus"}
+{"aggregate_congestion": 0.24365863498860882, "event": "ml_reassignment", "round_id": "9", "target_size": 6}
+{"agreed": false, "delta": -5.0, "event": "score_update", "node_id": "cav-000", "round_id": "10", "score": 57.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-001", "round_id": "10", "score": 111.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-002", "round_id": "10", "score": 111.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-003", "round_id": "10", "score": 111.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-004", "round_id": "10", "score": 111.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-005", "round_id": "10", "score": 111.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-006", "round_id": "10", "score": 111.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-007", "round_id": "10", "score": 111.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-008", "round_id": "10", "score": 111.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-009", "round_id": "10", "score": 111.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-010", "round_id": "10", "score": 111.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-011", "round_id": "10", "score": 111.0}
+{"density": 12, "event": "network", "latency_ms": 58.05323425380811, "pdr": 0.8277372348149766, "round_id": "10"}
+{"agreed": false, "delta": -5.0, "event": "score_update", "node_id": "cav-000", "round_id": "11", "score": 52.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-001", "round_id": "11", "score": 112.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-002", "round_id": "11", "score": 112.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-003", "round_id": "11", "score": 112.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-004", "round_id": "11", "score": 112.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-005", "round_id": "11", "score": 112.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-006", "round_id": "11", "score": 112.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-007", "round_id": "11", "score": 112.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-008", "round_id": "11", "score": 112.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-009", "round_id": "11", "score": 112.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-010", "round_id": "11", "score": 112.0}
+{"agreed": true, "delta": 1.0, "event": "score_update", "node_id": "cav-011", "round_id": "11", "score": 112.0}
+{"density": 12, "event": "network", "latency_ms": 63.14803081337764, "pdr": 0.8568510314493029, "round_id": "11"}
+{"consensus_size": 6, "density": 12, "event": "metric", "latency_ms": 59.64907917502029, "pdr": 0.8354305205699308, "round_id": 0, "throughput_packets": 12, "variant": "ml"}
+{"consensus_size": 6, "density": 12, "event": "metric", "latency_ms": 60.98244792586395, "pdr": 0.8038544738911443, "round_id": 1, "throughput_packets": 12, "variant": "ml"}
+{"consensus_size": 6, "density": 12, "event": "metric", "latency_ms": 59.45024849094052, "pdr": 0.8102111049850428, "round_id": 2, "throughput_packets": 11, "variant": "ml"}
+{"consensus_size": 6, "density": 12, "event": "metric", "latency_ms": 59.45120924759099, "pdr": 0.8263611689164402, "round_id": 3, "throughput_packets": 11, "variant": "ml"}
+{"consensus_size": 6, "density": 12, "event": "metric", "latency_ms": 62.478121202735664, "pdr": 0.8344655299316915, "round_id": 4, "throughput_packets": 11, "variant": "ml"}
+{"consensus_size": 6, "density": 12, "event": "metric", "latency_ms": 57.23191024845168, "pdr": 0.803881612209604, "round_id": 5, "throughput_packets": 11, "variant": "ml"}
+{"consensus_size": 6, "density": 12, "event": "metric", "latency_ms": 60.175198928371366, "pdr": 0.8676982647747485, "round_id": 6, "throughput_packets": 11, "variant": "ml"}
+{"consensus_size": 6, "density": 12, "event": "metric", "latency_ms": 62.39353930756497, "pdr": 0.8667861526630022, "round_id": 7, "throughput_packets": 11, "variant": "ml"}
+{"consensus_size": 6, "density": 12, "event": "metric", "latency_ms": 62.10187384821738, "pdr": 0.8090389800329191, "round_id": 8, "throughput_packets": 11, "variant": "ml"}
+{"consensus_size": 6, "density": 12, "event": "metric", "latency_ms": 56.58601854815422, "pdr": 0.8524031009858667, "round_id": 9, "throughput_packets": 11, "variant": "ml"}
+{"consensus_size": 6, "density": 12, "event": "metric", "latency_ms": 58.05323425380811, "pdr": 0.8277372348149766, "round_id": 10, "throughput_packets": 11, "variant": "ml"}
+{"consensus_size": 6, "density": 12, "event": "metric", "latency_ms": 63.14803081337764, "pdr": 0.8568510314493029, "round_id": 11, "throughput_packets": 11, "variant": "ml"}
