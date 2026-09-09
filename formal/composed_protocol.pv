@@ -1,0 +1,84 @@
+(* Composed symbolic model for CAV protocol spec v1.1.0.
+   Scope: TA credentials, signed suite negotiation, ephemeral KEM AKE, and a
+   signed PBFT vote. Cryptographic operations are idealized; timestamps and
+   replay-cache storage are represented by injective session events. *)
+
+free c: channel.
+free KEM768, SIG65, credential_tag, hello_tag, challenge_tag, confirm_tag, vote_tag: bitstring.
+free ta_sk, i_sk, r_sk, v_sk: bitstring [private].
+
+fun pk(bitstring): bitstring.
+fun sign(bitstring, bitstring): bitstring.
+reduc forall m:bitstring, sk:bitstring; checksign(sign(m, sk), pk(sk)) = m.
+fun kemenc(bitstring, bitstring): bitstring.
+reduc forall esk:bitstring, ss:bitstring; kemdec(kemenc(pk(esk), ss), esk) = ss.
+fun kdf(bitstring, bitstring): bitstring.
+fun transcript(bitstring, bitstring): bitstring.
+fun mac(bitstring, bitstring): bitstring.
+reduc forall m:bitstring, k:bitstring; checkmac(mac(m, k), k) = m.
+
+event Initiated(bitstring, bitstring, bitstring).
+event Responded(bitstring, bitstring, bitstring).
+event AcceptedI(bitstring, bitstring, bitstring, bitstring).
+event AcceptedR(bitstring, bitstring, bitstring, bitstring).
+event SuiteAgreedI(bitstring, bitstring, bitstring).
+event SuiteAgreedR(bitstring, bitstring, bitstring).
+event VoteSent(bitstring, bitstring, bitstring).
+event VoteAccepted(bitstring, bitstring, bitstring).
+
+let Initiator =
+  new sid:bitstring; new ni:bitstring; new esk:bitstring;
+  let epk = pk(esk) in
+  let credI = sign((credential_tag, pk(i_sk), SIG65), ta_sk) in
+  let hello = (hello_tag, sid, ni, epk, credI, KEM768, SIG65) in
+  event Initiated(sid, KEM768, SIG65);
+  out(c, (hello, sign(hello, i_sk)));
+  in(c, (challenge:bitstring, rsig:bitstring));
+  let (=challenge_tag, =sid, =ni, nr:bitstring, ct:bitstring, credR:bitstring, =KEM768, =SIG65) = checksign(rsig, pk(r_sk)) in
+  let (=credential_tag, =pk(r_sk), =SIG65) = checksign(credR, pk(ta_sk)) in
+  let th = transcript(hello, challenge) in
+  let key = kdf(kemdec(ct, esk), th) in
+  let confirm = (confirm_tag, sid, th, KEM768, SIG65, mac(th, key)) in
+  event SuiteAgreedI(sid, KEM768, SIG65);
+  out(c, (confirm, sign(confirm, i_sk)));
+  event AcceptedI(sid, key, KEM768, SIG65).
+
+let Responder =
+  in(c, (hello:bitstring, isig:bitstring));
+  let (=hello_tag, sid:bitstring, ni:bitstring, epk:bitstring, credI:bitstring, =KEM768, =SIG65) = checksign(isig, pk(i_sk)) in
+  let (=credential_tag, =pk(i_sk), =SIG65) = checksign(credI, pk(ta_sk)) in
+  event Responded(sid, KEM768, SIG65);
+  new nr:bitstring; new ss:bitstring;
+  let ct = kemenc(epk, ss) in
+  let credR = sign((credential_tag, pk(r_sk), SIG65), ta_sk) in
+  let challenge = (challenge_tag, sid, ni, nr, ct, credR, KEM768, SIG65) in
+  out(c, (challenge, sign(challenge, r_sk)));
+  in(c, (confirm:bitstring, csig:bitstring));
+  let (=confirm_tag, =sid, th:bitstring, =KEM768, =SIG65, tag:bitstring) = checksign(csig, pk(i_sk)) in
+  if th = transcript(hello, challenge) then
+    let confirmed_th = checkmac(tag, kdf(ss, transcript(hello, challenge))) in
+    if th = confirmed_th then
+      event SuiteAgreedR(sid, KEM768, SIG65);
+      event AcceptedR(sid, kdf(ss, transcript(hello, challenge)), KEM768, SIG65).
+
+let ConsensusVote =
+  new view:bitstring; new sequence:bitstring; new digest:bitstring;
+  let vote = (vote_tag, view, sequence, digest, SIG65) in
+  event VoteSent(view, sequence, digest);
+  out(c, (vote, sign(vote, v_sk))).
+
+let VoteReceiver =
+  in(c, (vote:bitstring, vsig:bitstring));
+  let (=vote_tag, view:bitstring, sequence:bitstring, digest:bitstring, =SIG65) = checksign(vsig, pk(v_sk)) in
+  event VoteAccepted(view, sequence, digest).
+
+query sid:bitstring, key:bitstring, kem:bitstring, sig:bitstring;
+  inj-event(AcceptedI(sid, key, kem, sig)) ==> inj-event(Responded(sid, kem, sig)).
+query sid:bitstring, key:bitstring, kem:bitstring, sig:bitstring;
+  inj-event(AcceptedR(sid, key, kem, sig)) ==> inj-event(Initiated(sid, kem, sig)).
+query sid:bitstring, kem:bitstring, sig:bitstring;
+  event(SuiteAgreedR(sid, kem, sig)) ==> event(SuiteAgreedI(sid, kem, sig)).
+query view:bitstring, sequence:bitstring, digest:bitstring;
+  event(VoteAccepted(view, sequence, digest)) ==> event(VoteSent(view, sequence, digest)).
+
+process (!Initiator | !Responder | !ConsensusVote | !VoteReceiver)

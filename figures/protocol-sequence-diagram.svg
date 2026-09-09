@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="760" viewBox="0 0 1180 760" role="img" aria-labelledby="title desc">
+  <title id="title">TA credential issuance and authenticated ML-KEM key establishment</title>
+  <desc id="desc">A sequence diagram showing the trusted authority, CAV and RSU. The CAV and RSU authenticate using ML-DSA credentials and establish a session key using a fresh ML-KEM ephemeral key.</desc>
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L10,3 L0,6 Z" fill="#1F5A99"/></marker>
+    <marker id="arrow-teal" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L10,3 L0,6 Z" fill="#087E8B"/></marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L10,3 L0,6 Z" fill="#25734D"/></marker>
+    <style>
+      .heading{font:700 25px Arial,sans-serif;fill:#102A43}.subtitle{font:400 15px Arial,sans-serif;fill:#486581}.actor{font:700 18px Arial,sans-serif;fill:#102A43}.label{font:600 14px Arial,sans-serif;fill:#102A43}.body{font:400 13px Arial,sans-serif;fill:#243B53}.small{font:400 12px Arial,sans-serif;fill:#486581}.mono{font:400 12px 'Courier New',monospace;fill:#243B53}.notehead{font:700 12px Arial,sans-serif;fill:#0B4F6C}.note{font:400 12px Arial,sans-serif;fill:#243B53}
+    </style>
+  </defs>
+  <rect width="1180" height="760" fill="#FFFFFF"/>
+  <text x="590" y="42" text-anchor="middle" class="heading">TA Credential Issuance and Authenticated ML-KEM-768 Key Establishment</text>
+  <text x="590" y="68" text-anchor="middle" class="subtitle">ML-DSA-65 authenticates credentials and protocol messages; ML-KEM-768 establishes the ephemeral shared secret.</text>
+  <rect x="88" y="97" width="190" height="54" rx="6" fill="#EAF2FB" stroke="#1F5A99" stroke-width="1.5"/>
+  <rect x="495" y="97" width="190" height="54" rx="6" fill="#E8F7F5" stroke="#087E8B" stroke-width="1.5"/>
+  <rect x="902" y="97" width="190" height="54" rx="6" fill="#EFF7EC" stroke="#25734D" stroke-width="1.5"/>
+  <text x="183" y="130" text-anchor="middle" class="actor">Trusted Authority (TA)</text>
+  <text x="590" y="130" text-anchor="middle" class="actor">CAV / Initiator</text>
+  <text x="997" y="130" text-anchor="middle" class="actor">RSU / Responder</text>
+  <line x1="183" y1="151" x2="183" y2="710" stroke="#8AA1B4" stroke-width="1.5" stroke-dasharray="7 6"/>
+  <line x1="590" y1="151" x2="590" y2="710" stroke="#8AA1B4" stroke-width="1.5" stroke-dasharray="7 6"/>
+  <line x1="997" y1="151" x2="997" y2="710" stroke="#8AA1B4" stroke-width="1.5" stroke-dasharray="7 6"/>
+  <rect x="35" y="176" width="1110" height="101" rx="6" fill="#F5F9FD" stroke="#C8D8E8"/>
+  <text x="54" y="202" class="label">1. Pseudonymous credential issuance</text>
+  <line x1="196" y1="224" x2="574" y2="224" stroke="#1F5A99" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <text x="385" y="217" text-anchor="middle" class="body">Credential = {pid, pk<tspan baseline-shift="sub" font-size="10">sig,CAV</tspan>, issued/expiry, nonce, ML-DSA-65}</text>
+  <text x="385" y="242" text-anchor="middle" class="mono">σTA = Sign(skTA, canonical(Credential))</text>
+  <text x="385" y="261" text-anchor="middle" class="small">CAV validates the TA signature and expiry before protocol use.</text>
+  <rect x="35" y="296" width="1110" height="354" rx="6" fill="#FCFDFE" stroke="#C8D8E8"/>
+  <text x="54" y="322" class="label">2. Signed ephemeral authenticated key establishment</text>
+  <line x1="605" y1="357" x2="981" y2="357" stroke="#087E8B" stroke-width="2" marker-end="url(#arrow-teal)"/>
+  <text x="793" y="348" text-anchor="middle" class="label">HELLO + σ<tspan baseline-shift="sub" font-size="10">CAV</tspan></text>
+  <text x="793" y="374" text-anchor="middle" class="body">sid, n<tspan baseline-shift="sub" font-size="10">I</tspan>, timestamp, pk<tspan baseline-shift="sub" font-size="10">KEM,I</tspan> (fresh), Credential<tspan baseline-shift="sub" font-size="10">CAV</tspan>, suite IDs</text>
+  <text x="793" y="394" text-anchor="middle" class="mono">σCAV = ML-DSA.Sign(skSig,CAV, HELLO)</text>
+  <rect x="781" y="413" width="325" height="68" rx="5" fill="#F0FBF9" stroke="#8CCFC8"/>
+  <text x="944" y="435" text-anchor="middle" class="notehead">RSU validation gate</text>
+  <text x="944" y="453" text-anchor="middle" class="note">Verify credential, suite, freshness, replay cache, and σCAV.</text>
+  <text x="944" y="470" text-anchor="middle" class="note">Abort on any failed check; otherwise encapsulate (ct, ss).</text>
+  <line x1="981" y1="510" x2="605" y2="510" stroke="#25734D" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <text x="793" y="501" text-anchor="middle" class="label">CHALLENGE + σ<tspan baseline-shift="sub" font-size="10">RSU</tspan></text>
+  <text x="793" y="527" text-anchor="middle" class="body">sid, n<tspan baseline-shift="sub" font-size="10">I</tspan>, n<tspan baseline-shift="sub" font-size="10">R</tspan>, timestamp, ct = ML-KEM.Encap(pk<tspan baseline-shift="sub" font-size="10">KEM,I</tspan>), Credential<tspan baseline-shift="sub" font-size="10">RSU</tspan></text>
+  <text x="793" y="547" text-anchor="middle" class="mono">σRSU = ML-DSA.Sign(skSig,RSU, CHALLENGE)</text>
+  <line x1="605" y1="574" x2="981" y2="574" stroke="#087E8B" stroke-width="2" marker-end="url(#arrow-teal)"/>
+  <text x="793" y="565" text-anchor="middle" class="label">CONFIRM + σ<tspan baseline-shift="sub" font-size="10">CAV</tspan></text>
+  <text x="793" y="592" text-anchor="middle" class="body">sid, th = H(HELLO || σ<tspan baseline-shift="sub" font-size="10">CAV</tspan> || CHALLENGE || σ<tspan baseline-shift="sub" font-size="10">RSU</tspan>), HMAC(K<tspan baseline-shift="sub" font-size="10">s</tspan>, “initiator-confirm” || th)</text>
+  <text x="793" y="612" text-anchor="middle" class="mono">K_s = H("CAV-AKE-v1" || ss || th)</text>
+  <rect x="73" y="666" width="1035" height="56" rx="6" fill="#F0F7F1" stroke="#9DC8A6"/>
+  <text x="590" y="689" text-anchor="middle" class="label">Acceptance and security boundary</text>
+  <text x="590" y="709" text-anchor="middle" class="body">RSU verifies CONFIRM and σCAV, derives the same K<tspan baseline-shift="sub" font-size="10">s</tspan>, then both erase ephemeral KEM material. Failed validation yields no session key.</text>
+</svg>
