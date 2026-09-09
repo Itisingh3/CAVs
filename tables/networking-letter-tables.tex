@@ -1,0 +1,63 @@
+% Compact IEEE-style tables for the networking letter.
+% Table II values are measured locally (20 repetitions), not literature values.
+% Requires: \usepackage{booktabs}
+
+% Include in Section II-C (Design Goals and Gap Analysis), preferably after contributions.
+\begin{table}[t]
+\caption{Comparison of the base paper and the proposed design.}
+\label{tab:method-comparison}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3.4pt}
+\begin{tabular}{p{2.35cm}ccccc}
+\toprule
+\textbf{Scheme} & \textbf{Std. KEM} & \textbf{Std. sig.} & \textbf{Formal check} & \textbf{Grouping} & \textbf{Multi-seed stats} \\
+\midrule
+Base AGS-PBFT~\cite{aslam2025} & ML-KEM precursor & No$^{a}$ & No & Static score & No \\
+Recent PQC-V2X schemes~\cite{rasheed2025,mishra2025,asim2026} & Varies & Varies & Varies & Varies & Varies \\
+Proposed & ML-KEM-768 & ML-DSA-65 & ProVerif + proof sketch & Online ML + fallback & Paired CI/tests$^{b}$ \\
+\bottomrule
+\multicolumn{6}{p{7.2cm}}{\scriptsize $^{a}$The source paper names signature tokens but does not specify a verifiable signature construction. $^{b}$Report only after final SUMO/Veins/OMNeT++ runs with $\geq30$ untouched paired seeds.} \\
+\end{tabular}
+\end{table}
+
+% Include in Section V-C (Formal Security Verification), immediately after the theorem/proof sketch.
+\begin{table}[t]
+\caption{Security-property mapping and verification target.}
+\label{tab:security-mapping}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4.0pt}
+\begin{tabular}{p{2.0cm}p{3.0cm}p{2.25cm}}
+\toprule
+\textbf{Property} & \textbf{Mechanism} & \textbf{Formal check} \\
+\midrule
+Mutual authentication & TA-validated ML-DSA credentials; signed \texttt{HELLO}, \texttt{CHALLENGE}, and \texttt{CONFIRM} & Injective correspondence \\
+Session-key secrecy & Fresh ML-KEM ephemeral key, transcript hash, and KDF & Secrecy / observational equivalence \\
+Replay resistance & Session identifier, nonces, timestamps, and replay cache & Authentication correspondence plus replay-cache rule \\
+PBFT integrity & ML-DSA-signed votes; distinct-sender counting; $2f+1$ quorum & Protocol rule under $n\geq3f+1$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% Include in Section VI-A (Implementation and Measurement Setup), before network-level results.
+\begin{table}[t]
+\caption{Measured PQC overhead on the experiment machine (20 repetitions).}
+\label{tab:pqc-overhead}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4.8pt}
+\begin{tabular}{llrr}
+\toprule
+\textbf{Primitive} & \textbf{Operation} & \textbf{Mean (ms)} & \textbf{Output / key size} \\
+\midrule
+ML-KEM-768 & Key generation & 10.764 & $pk$: 1184 B; $sk$: 2400 B \\
+ML-KEM-768 & Encapsulation & 0.612 & $ct$: 1088 B; $ss$: 32 B \\
+ML-KEM-768 & Decapsulation & 0.683 & $ss$: 32 B \\
+ML-DSA-65 & Key generation & 1.218 & $pk$: 1952 B; $sk$: 4032 B \\
+ML-DSA-65 & Signing & 5.860 & signature: 3309 B \\
+ML-DSA-65 & Verification & 1.660 & -- \\
+\bottomrule
+\multicolumn{4}{p{7.35cm}}{\scriptsize CPU-only measurement on AMD Ryzen 5 5600H (3.30 GHz), with maintained \texttt{liboqs-python}; no GPU or external hardware was used. Values are microbenchmarks, not end-to-end V2X latency.} \\
+\end{tabular}
+\end{table}
