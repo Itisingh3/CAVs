@@ -62,12 +62,28 @@ This block *is* the protocol figure's caption text — reuse it directly as Figu
 
 ### 4.1 What it replaces — unchanged (fixed +1/-5, μ±σ, fixed cadence).
 
-### 4.2 Multi-algorithm predictor (CHANGED from v2, updated)
-Same six-feature vector (`agreement_rate, normalized_rtt, pdr, link_quality, score_trend, recent_fault_rate`). Compare, on train/validation seeds only, four algorithms spanning the lightweight-to-heavier spectrum:
+### 4.2 Causal temporal reliability layer (updated)
+The grouping decision uses a ten-field, causal window: `agreement_rate`,
+`normalized_rtt`, `pdr`, `link_quality`, `score_trend`,
+`recent_fault_rate`, `velocity_stability`, `consensus_participation`,
+`historical_reputation`, and `credential_trust`.  Larger values consistently
+mean stronger evidence except normalized RTT and fault rate.  The first six
+fields remain the bounded predictor input; the full window is retained to
+separate transient network degradation from persistent bad behaviour.
+
+Compare, on train/validation trace groups only, four bounded candidates:
 - **Logistic Regression** (existing online baseline — cheapest, incremental, linear decision boundary)
 - **Decision Tree** (single shallow tree — cheap to evaluate, interpretable, captures simple nonlinear splits)
 - **Ensemble method** (Random Forest or Gradient-Boosted Trees — captures nonlinearity and feature interactions; note in the letter that only the *trained* ensemble's inference cost matters for OBU deployment, training itself is offline)
 - **MLP** (single hidden layer — upper bound of what's still "lightweight," used to show diminishing returns relative to the added complexity)
+
+The selected predictor yields \(P_i^{ML}\).  A separate, interpretable
+calibration layer learns (from validation labels, not manually assigned
+constants) the four inputs \(P_i^{ML}\), historical evidence, consensus
+evidence, and network evidence.  It produces the final reliability score
+used for ranking.  A BiLSTM remains a future comparison only after a genuine
+sequential CAV telemetry corpus exists; it must not be claimed from
+non-sequential CAN data.
 
 ### 4.2.1 Metrics — confusion-matrix definitions (mapped from the standard testing/condition table)
 Adapt the standard confusion-matrix framework directly to this problem, relabeling condition/test in terms of node reliability rather than the shaded/unshaded template it's usually drawn for:
@@ -90,7 +106,12 @@ Report **all five of precision, recall, accuracy, F1, and AUROC** per algorithm 
 
 State explicitly: whichever algorithm wins, **inference-time cost stays OBU-appropriate** — the comparison is about predictive quality; the latency constraint is separate and already satisfied by all four at inference time.
 
-### 4.3 Integration + fallback — unchanged from v2 (best-model's output replaces the μ±σ decision; fallback guard unchanged).
+### 4.3 Integration + fallback
+The score replaces the \(\mu\pm\sigma\) membership decision only after the
+base predictor and calibration layer are fitted and confidence is adequate.
+Otherwise, invalid/missing evidence, fewer than ten observations, or low
+confidence triggers the best static policy and logs the reason.  PBFT always
+enforces \(n\geq3f+1\).
 
 ### 4.4 What NOT to attempt — unchanged from v2 (no novel ML architecture claim, no regret-bound derivation).
 
@@ -109,21 +130,32 @@ State explicitly: whichever algorithm wins, **inference-time cost stays OBU-appr
 | `query attacker(sessionKey)` | Eavesdropping / session-key disclosure |
 | `query attacker(sk_CAV)` / `sk_RSU` | Long-term key disclosure |
 | Injective correspondence `AcceptedByCAV ==> InitiatedByRSU` | Impersonation, MITM, replay |
-| `phase 1` long-term key leak + phase-0 session-key secrecy | Forward secrecy under long-term key compromise — this is the property ProVerif's `phase` construct handles natively and cleanly; it's the reason ProVerif stays the tool of record here |
+| Observational-equivalence secrecy model | Symbolic indistinguishability of the isolated ephemeral-KEM/KDF construction; not a claim of final composed forward secrecy |
 
-- Note the existing model split: `model.pv` covers correspondence/authentication, `secrecy_equivalence.pv` isolates the ephemeral-KEM/KDF observational-equivalence secrecy check. Both must be extended to the *final* frozen spec before the letter's numbers are locked — see `PROJECT_KNOWLEDGE_BASE.md` §4.4 boundary notes (symbolic-model checks only, not implementation or side-channel security — say this explicitly in the letter).
+- Note the existing model split: `model.pv` covers correspondence/authentication, `secrecy_equivalence.pv` isolates the ephemeral-KEM/KDF observational-equivalence secrecy check. Neither establishes source-code security, side-channel resistance, availability, or final composed forward secrecy.
 - Deliver one verified-properties table (property x checkmark/x x notes) — same payoff-figure role as before, Figure/Table 3.
 
 ---
 
 ## 6. Evaluation (0.75p)
 
-### 6.1 Multi-seed methodology — unchanged (>=30 seeds, mean±CI, paired t-test/Wilcoxon, ANOVA+Bonferroni across densities).
+### 6.1 Data and split methodology
+Use complete causal trace groups rather than random rows: train for fitting,
+validation for candidate/threshold/calibration selection, and one locked test
+set for final reporting.  Report precision, recall, accuracy, F1, AUROC,
+confusion matrix, and uncertainty where the number of independent trace
+groups permits it.  The external ROAD CAN corpus trains only an automotive
+intrusion-probability branch; it is not described as CAV, V2X, PBFT, or a
+networking experiment.
 
 ### 6.2 Hyperparameter ablation → best-static control — unchanged from v2 §6.2.
 
 ### 6.3 ML predictor comparison — NEW, replaces part of old §6.3
-The precision/recall/accuracy/F1/AUROC grouped bar chart from §4.2 (four algorithms: Logistic Regression, Decision Tree, ensemble, MLP), generated from train/validation seeds; the winning predictor (by F1 or AUROC, not raw accuracy, given class imbalance) is what's carried into the ML-vs-best-static latency/throughput comparison on untouched test seeds.
+The precision/recall/accuracy/F1/AUROC comparison for the four base predictors
+is generated from train/validation trace groups.  The chosen model and its
+learned four-evidence calibration score are evaluated once on locked test
+traces.  Do not use development-harness output, borrowed literature figures,
+or an external CAN result as ML-versus-static networking evidence.
 
 ### 6.4 Crypto-agility comparison table — unchanged from v2 §6.3 (Kyber/Saber, ML-DSA overhead vs. hash-token, be honest about the overhead).
 

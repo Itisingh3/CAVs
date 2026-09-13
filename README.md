@@ -6,8 +6,9 @@ This repository is the reproducible reference implementation accompanying the pl
 
 - Default suite: ML-KEM-768 plus ML-DSA-65 through Open Quantum Safe (`liboqs-python`).
 - Saber is deliberately not enabled: it is an experimental backend and must be added only through a maintained PQClean/liboqs binding.
-- The bundled simulator is a **documented lightweight equivalent**, designed for development and reproducibility on an 8 GB RAM laptop. It is not a replacement for the final SUMO/Veins/OMNeT++ study.
-- No experiment result is supplied or claimed by this repository. Results are generated from logged runs only.
+- The bundled development harness is not a SUMO/Veins/OMNeT++ simulation and is not reported as a networking experiment.
+- The reliability implementation separates an ML probability from learned historical, consensus, and network evidence. The coefficients are fitted on validation data, never hand-selected.
+- The selected public source is ROAD, a real-vehicle CAN intrusion dataset. It trains only the automotive intrusion-probability branch; it is not represented as V2X or PBFT data. See `data/README.md`.
 
 ## Hardware-aware setup
 
@@ -35,24 +36,19 @@ If `oqs` cannot be imported, protocol cryptography is intentionally unavailable.
 # Run standard-library tests (PQC integration tests skip until oqs is installed)
 python -m unittest discover -s tests -v
 
-# Run the controlled paired development model (30 seeds, 300 rounds, 60 warm-up)
-# This validates the experimental pipeline only; it is not a SUMO/Veins result.
-python -m sim.run_paired_development_experiment --density 60 --seeds 30 --rounds 300 --warmup-rounds 60 --output results/development_paired
-
-# Aggregate at the run/seed level and write paired-effect statistics
-python -m analysis.stats results/development_paired --output results/analysis_paired
-
-# Execute the pre-registered multi-seed framework.
-# It creates a 60/20/20 train/validation/test seed split from 150 seeds,
-# then evaluates only the 30 untouched test seeds with paired policies.
-# This remains a controlled development model, not a SUMO/Veins result.
-python -m sim.run_multiseed_study --output results/multiseed_framework_development
-python -m analysis.stats results/multiseed_framework_development --output results/analysis_multiseed_framework
-python -m analysis.generate_figures results/analysis_multiseed_framework/paired_comparison.csv --summary results/analysis_multiseed_framework/summary.csv --output figures/multiseed-framework-development
+# Optional: download the documented external automotive CAN source.
+# It is a substantial archive, is excluded from git, and must not be called CAV/PBFT data.
+python -m data.download_road --destination data/raw/ROAD
 
 # Compare all four predictors using only pre-registered train/validation rows.
 # The CSV must contain split,reliable and the six columns from spec/ml_grouping_interface.md.
 python -m ml.evaluate_predictors results/reliability_train_validation.csv --output results/ml_predictor_comparison.csv
+
+# Full causal reliability training, after collecting instrumented protocol windows
+# in the schema documented at data/README.md.  The locked test split is read only
+# when the explicit flag is supplied.
+python -m ml.train_temporal_pipeline data/derived/cav_reliability_windows.csv --output results/temporal_validation.csv
+python -m ml.train_temporal_pipeline data/derived/cav_reliability_windows.csv --output results/temporal_final.csv --evaluate-locked-test
 ```
 
 ## Reproducibility rules
@@ -60,6 +56,6 @@ python -m ml.evaluate_predictors results/reliability_train_validation.csv --outp
 1. Freeze `spec/` before running evaluations. Any protocol change requires a spec version bump and a ProVerif-model update.
 2. Split seeds with `sim.seed_manager` before model tuning. Final claims may use only the `test` split.
 3. Preserve each run's JSONL event log and manifest. Figures/tables must be generated from these files, never hand-entered.
-4. Use at least 30 paired test seeds for paper figures. Development-model runs are pipeline validation only; repeat the same protocol through SUMO/Veins/OMNeT++ before making a networking-performance claim.
+4. Use only a completely locked trace group for final metrics. Development-harness values and external CAN results are not networking-performance claims.
 
 See `spec/` for protocol details and `CAV_Letter_Outline.md` for the paper architecture.

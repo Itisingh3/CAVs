@@ -21,10 +21,10 @@ class PredictorTests(unittest.TestCase):
             self.assertGreaterEqual(predictor.predict(features), 0.0)
             self.assertLessEqual(predictor.predict(features), 1.0)
 
-    def test_validation_reports_five_metrics_and_never_accepts_test_rows(self):
+    def test_validation_reports_discrimination_metrics_and_never_accepts_test_rows(self):
         records = [*(row(index % 2 == 0, "train") for index in range(32)), *(row(index % 2 == 0, "validation") for index in range(12))]
         result = train_and_validate(records)
         self.assertEqual(set(result), set(PREDICTOR_FACTORIES))
-        self.assertTrue(all(0 <= value.f1 <= 1 and 0 <= value.auroc <= 1 for value in result.values()))
+        self.assertTrue(all(0 <= value.f1 <= 1 and 0 <= value.auroc <= 1 and 0 <= value.auprc <= 1 for value in result.values()))
         self.assertIn(select_winner(result), result)
         with self.assertRaises(ValueError): train_and_validate([*records, row(True, "test")])

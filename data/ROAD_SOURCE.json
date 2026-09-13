@@ -1,0 +1,8 @@
+{
+  "name": "Real ORNL Automotive Dynamometer (ROAD) CAN Intrusion Dataset",
+  "zenodo_record": "10462796",
+  "landing_page": "https://zenodo.org/records/10462796",
+  "intended_use": "External automotive CAN intrusion-probability training only; not a V2X/PBFT evaluation dataset.",
+  "raw_destination": "data/raw/ROAD/",
+  "status": "download separately; raw archive is intentionally excluded from version control"
+}

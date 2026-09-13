@@ -10,4 +10,4 @@ requires-python = ">=3.10"
 dependencies = ["liboqs-python>=0.10"]
 
 [tool.setuptools]
-packages = ["crypto", "protocol", "consensus", "ml", "sim", "analysis"]
+packages = ["crypto", "protocol", "consensus", "ml", "sim", "analysis", "data"]

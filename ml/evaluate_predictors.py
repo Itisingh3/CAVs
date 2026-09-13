@@ -31,6 +31,7 @@ class PredictorMetrics:
     accuracy: float
     f1: float
     auroc: float
+    auprc: float
     true_positive: int
     false_positive: int
     false_negative: int
@@ -50,7 +51,18 @@ def metrics(labels: list[bool], probabilities: list[float], threshold: float = 0
     positives, negatives = [score for label, score in zip(labels, probabilities) if label], [score for label, score in zip(labels, probabilities) if not label]
     # Mann-Whitney formulation, including half credit for ties.
     auroc = sum((positive > negative) + 0.5 * (positive == negative) for positive in positives for negative in negatives) / (len(positives) * len(negatives)) if positives and negatives else float("nan")
-    return PredictorMetrics(precision, recall, accuracy, f1, auroc, tp, fp, fn, tn)
+    # Average precision is the area under the step-wise precision-recall
+    # curve.  Unlike accuracy it remains informative for rare unreliable nodes.
+    positives_total = sum(labels)
+    ranked = sorted(zip(probabilities, labels), reverse=True)
+    found_positive, prior_recall, auprc = 0, 0.0, 0.0
+    for rank, (_, label) in enumerate(ranked, start=1):
+        if label:
+            found_positive += 1
+            recall_at_rank = found_positive / positives_total
+            auprc += (found_positive / rank) * (recall_at_rank - prior_recall)
+            prior_recall = recall_at_rank
+    return PredictorMetrics(precision, recall, accuracy, f1, auroc, auprc, tp, fp, fn, tn)
 
 
 def train_and_validate(records: list[LabeledWindow]) -> dict[str, PredictorMetrics]:
@@ -83,7 +95,7 @@ def read_records(path: Path) -> list[LabeledWindow]:
 def write_report(path: Path, results: dict[str, PredictorMetrics]) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as handle:
-        fields = ["model", "precision", "recall", "accuracy", "f1", "auroc", "true_positive", "false_positive", "false_negative", "true_negative"]
+        fields = ["model", "precision", "recall", "accuracy", "f1", "auroc", "auprc", "true_positive", "false_positive", "false_negative", "true_negative"]
         writer = csv.DictWriter(handle, fieldnames=fields); writer.writeheader()
         for name, value in results.items(): writer.writerow({"model": name, **value.__dict__})
     return path
