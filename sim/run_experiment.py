@@ -49,7 +49,7 @@ def _round_outcome(rng: random.Random, selected_ids: set[str], conditions: dict[
     return {"agreed": agreed, "latency_ms": 20 + density * .35 + mean_rtt * 45 + len(selected_ids) * 1.8 + malicious_fraction * 90 + (0 if committed else 120), "throughput_packets": max(0.0, (len(agreed) if committed else 0) * (1 - congestion * .30)), "pdr": max(0.0, min(1.0, reliability * (1 - congestion * .22) * (1 - malicious_fraction * .35))), "control_bytes": len(selected_ids) * 3309 * 3, "committed": float(committed), "false_removals": float(false_removals), "false_removal_rate": false_removals / honest_nodes, "malicious_selected": float(sum(1 for node in selected_ids if conditions[node].malicious))}
 
 
-def run(variant: str, seed: int, density: int, output: Path, rounds: int = 300, warmup_rounds: int = 60, predictor_name: str = "logistic_regression") -> Path:
+def run(variant: str, seed: int, density: int, output: Path, rounds: int = 300, warmup_rounds: int = 60, predictor_name: str = "logistic_regression", reassignment_window: int | None = None, ags_config: AGSConfig | None = None) -> Path:
     if density < 4: raise ValueError("density must be at least 4")
     if rounds <= warmup_rounds: raise ValueError("rounds must exceed warmup_rounds")
     streams = derive_streams(seed)
@@ -60,7 +60,12 @@ def run(variant: str, seed: int, density: int, output: Path, rounds: int = 300, 
     attack_rng = random.Random(streams["attack"])
     node_ids = [f"cav-{index:03d}" for index in range(density)]
     f = max(1, (density - 1) // 6)
-    config = AGSConfig(min_consensus_nodes=3 * f + 1, reassignment_window=10)
+    # The development control uses the paper/project baseline (50 requests)
+    # unless an explicit ablation value is supplied through the CLI.
+    if ags_config is not None:
+        config = ags_config
+    else:
+        config = AGSConfig(min_consensus_nodes=3 * f + 1) if reassignment_window is None else AGSConfig(min_consensus_nodes=3 * f + 1, reassignment_window=reassignment_window)
     engine = MLAdaptiveAGSPBFT(node_ids, f, config, create_predictor(predictor_name)) if variant == "ml" else AGSPBFTBaseline(node_ids, f, config)
     malicious = set(attack_rng.sample(node_ids, min(f, len(node_ids) // 4)))
     conditions = {node: NodeCondition(initialization_rng.uniform(.62, .98), node in malicious) for node in node_ids}
@@ -89,7 +94,7 @@ def run(variant: str, seed: int, density: int, output: Path, rounds: int = 300, 
         if row["phase"] == "evaluation": row["malicious_removal_time"] = removal_time
     output.mkdir(parents=True, exist_ok=True)
     stem = output / f"{variant}_seed{seed}_density{density}"
-    manifest = {"variant":variant,"predictor":predictor_name if variant == "ml" else None,"seed":seed,"seed_streams":streams,"density":density,"rounds":rounds,"warmup_rounds":warmup_rounds,"engine":"controlled-development-model-not-veins","paired_seed":seed,"python":sys.version,"platform":platform.platform(),"warning":"Development model only. Do not cite these as SUMO/Veins/OMNeT++ or real-network results."}
+    manifest = {"variant":variant,"predictor":predictor_name if variant == "ml" else None,"seed":seed,"seed_streams":streams,"density":density,"rounds":rounds,"warmup_rounds":warmup_rounds,"ags_config":{"agreement_delta":config.agreement_delta,"disagreement_delta":config.disagreement_delta,"threshold_multiplier":config.threshold_multiplier,"reassignment_window":config.reassignment_window},"reassignment_window":config.reassignment_window,"engine":"controlled-development-model-not-veins","paired_seed":seed,"python":sys.version,"platform":platform.platform(),"warning":"Development model only. Do not cite these as SUMO/Veins/OMNeT++ or real-network results."}
     stem.with_suffix(".manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     with stem.with_suffix(".events.jsonl").open("w", encoding="utf-8") as handle:
         for row in [*engine.events, *rows]: handle.write(json.dumps(row, sort_keys=True) + "\n")
@@ -104,8 +109,9 @@ def main() -> None:
     parser.add_argument("--rounds", type=int, default=300)
     parser.add_argument("--warmup-rounds", type=int, default=60)
     parser.add_argument("--predictor", choices=tuple(PREDICTOR_FACTORIES), default="logistic_regression", help="pre-selected train/validation winner; never select from test output")
+    parser.add_argument("--reassignment-window", type=int, help="explicit ablation override; default is the baseline 50")
     parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args(); print(run(args.variant, args.seed, args.density, args.output, args.rounds, args.warmup_rounds, args.predictor))
+    args = parser.parse_args(); print(run(args.variant, args.seed, args.density, args.output, args.rounds, args.warmup_rounds, args.predictor, args.reassignment_window))
 
 
 if __name__ == "__main__": main()

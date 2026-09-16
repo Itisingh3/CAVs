@@ -31,6 +31,7 @@ class ConsensusTests(unittest.TestCase):
             stem = run("ml", 101, 18, Path(directory), rounds=80, warmup_rounds=20)
             events = [json.loads(line) for line in stem.with_suffix(".events.jsonl").read_text(encoding="utf-8").splitlines()]
             self.assertTrue(any(event["event"] == "ml_reassignment" for event in events))
+            self.assertEqual(json.loads(stem.with_suffix(".manifest.json").read_text(encoding="utf-8"))["reassignment_window"], 50)
 
     def test_external_temporal_probability_uses_score_or_explicit_fallback(self):
         evidence = TemporalEvidence(.8, .2, .9, .9, .7, .1, .8, .8, .8, 1.0)
