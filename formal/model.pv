@@ -1,44 +1,89 @@
-(* ProVerif symbolic model for the cryptographic core of spec v1.0.0.
-   Credentials, timestamps, and replay caches are checked by the executable protocol;
-   this model abstracts TA-validated public keys and focuses on the signed ephemeral-KEM flow. *)
+(* Final frozen CAV AKE model (spec v1.1.0).
+   It represents TA credentials, ML-DSA-authenticated HELLO/CHALLENGE/CONFIRM,
+   ML-KEM ephemeral encapsulation, transcript-bound key confirmation, suite
+   binding, fresh signed timestamp tokens, and a replay-cache abstraction.
+   ML reliability is empirical policy after protocol acceptance, not symbolic. *)
 free c: channel.
-free i_sk, r_sk: bitstring [private].
-
+free KEM768, SIG65, credential_tag, hello_tag, challenge_tag, confirm_tag: bitstring.
+free ta_sk, i_sk, r_sk: bitstring [private].
 fun pk(bitstring): bitstring.
 fun sign(bitstring, bitstring): bitstring.
 reduc forall m:bitstring, sk:bitstring; checksign(sign(m, sk), pk(sk)) = m.
 fun kemenc(bitstring, bitstring): bitstring.
 reduc forall esk:bitstring, ss:bitstring; kemdec(kemenc(pk(esk), ss), esk) = ss.
 fun kdf(bitstring, bitstring): bitstring.
+fun transcript(bitstring, bitstring): bitstring.
+fun mac(bitstring, bitstring): bitstring.
+reduc forall m:bitstring, k:bitstring; checkmac(mac(m, k), k) = m.
 
-event Initiated(bitstring).
-event Responded(bitstring).
-event AcceptedI(bitstring, bitstring).
-event AcceptedR(bitstring, bitstring).
+(* Replay identity abstracts executable (pid, sid, nonce_i) replay cache. *)
+table replayed(bitstring).
+event CredentialIssued(bitstring, bitstring).
+event CredentialAccepted(bitstring, bitstring).
+event HelloSent(bitstring, bitstring, bitstring).
+event ReplayClaimed(bitstring, bitstring, bitstring).
+event InitiatorStarted(bitstring).
+event ResponderStarted(bitstring).
+event ChallengeSent(bitstring, bitstring, bitstring).
+event ConfirmSent(bitstring, bitstring).
+event AcceptedI(bitstring, bitstring, bitstring, bitstring).
+event AcceptedR(bitstring, bitstring, bitstring, bitstring).
+event SuiteAgreedI(bitstring, bitstring, bitstring).
+event SuiteAgreedR(bitstring, bitstring, bitstring).
 
 let Initiator =
-  new sid: bitstring; new esk: bitstring;
-  let epk = pk(esk) in
-  event Initiated(sid);
-  out(c, (sid, epk, sign((sid, epk), i_sk)));
-  in(c, (sid2:bitstring, ct:bitstring, rsig:bitstring));
-  let (=sid, ct2:bitstring) = checksign(rsig, pk(r_sk)) in
-  let ss = kemdec(ct2, esk) in
-  event AcceptedI(sid, kdf(ss, sid)).
+  new pidI:bitstring; new sidI:bitstring; new nonceI:bitstring; new timestampI:bitstring; new eskI:bitstring;
+  let epkI = pk(eskI) in
+  let credI = sign((credential_tag, pidI, pk(i_sk), SIG65), ta_sk) in
+  event CredentialIssued(pidI, pk(i_sk));
+  let hello = (hello_tag, sidI, nonceI, timestampI, epkI, credI, KEM768, SIG65) in
+  event HelloSent(pidI, sidI, nonceI);
+  event InitiatorStarted(sidI);
+  out(c, (hello, sign(hello, i_sk)));
+  in(c, (challenge:bitstring, signatureR:bitstring));
+  let (=challenge_tag, =sidI, =nonceI, timestampR:bitstring, nonceR:bitstring, ciphertext:bitstring, credentialR:bitstring, =KEM768, =SIG65) = checksign(signatureR, pk(r_sk)) in
+  let (=credential_tag, pidR:bitstring, =pk(r_sk), =SIG65) = checksign(credentialR, pk(ta_sk)) in
+  event CredentialAccepted(pidR, pk(r_sk));
+  let th = transcript((hello, sign(hello, i_sk)), (challenge, signatureR)) in
+  let key = kdf(kemdec(ciphertext, eskI), th) in
+  let confirm = (confirm_tag, sidI, th, KEM768, SIG65, mac(th, key)) in
+  event SuiteAgreedI(sidI, KEM768, SIG65);
+  event ConfirmSent(sidI, th);
+  out(c, (confirm, sign(confirm, i_sk)));
+  event AcceptedI(sidI, key, KEM768, SIG65).
 
-let Responder =
-  in(c, (sid:bitstring, epk:bitstring, isig:bitstring));
-  let (=sid, =epk) = checksign(isig, pk(i_sk)) in
-  event Responded(sid);
-  new ss: bitstring;
-  let ct = kemenc(epk, ss) in
-  out(c, (sid, ct, sign((sid, ct), r_sk)));
-  event AcceptedR(sid, kdf(ss, sid)).
+(* Private token serializes lookup/insert, modelling an atomic replay cache. *)
+let Responder(cache:channel) =
+  in(c, (helloR:bitstring, signatureI:bitstring));
+  let (=hello_tag, sidR:bitstring, nonceIR:bitstring, timestampIR:bitstring, epkIR:bitstring, credentialI:bitstring, =KEM768, =SIG65) = checksign(signatureI, pk(i_sk)) in
+  let (=credential_tag, pidIR:bitstring, =pk(i_sk), =SIG65) = checksign(credentialI, pk(ta_sk)) in
+  event CredentialAccepted(pidIR, pk(i_sk));
+  in(cache, cacheToken:nat);
+  get replayed((=pidIR, =sidR, =nonceIR)) in out(cache, cacheToken) else
+    insert replayed((pidIR, sidR, nonceIR));
+    out(cache, cacheToken);
+    event ReplayClaimed(pidIR, sidR, nonceIR);
+    event ResponderStarted(sidR);
+    new timestampR:bitstring; new nonceR:bitstring; new sharedSecret:bitstring;
+    let ciphertext = kemenc(epkIR, sharedSecret) in
+    let credentialR = sign((credential_tag, pidIR, pk(r_sk), SIG65), ta_sk) in
+    let challenge = (challenge_tag, sidR, nonceIR, timestampR, nonceR, ciphertext, credentialR, KEM768, SIG65) in
+    event ChallengeSent(sidR, nonceIR, nonceR);
+    out(c, (challenge, sign(challenge, r_sk)));
+    in(c, (confirmR:bitstring, confirmSignature:bitstring));
+    let (=confirm_tag, =sidR, thR:bitstring, =KEM768, =SIG65, tag:bitstring) = checksign(confirmSignature, pk(i_sk)) in
+    if thR = transcript((helloR, signatureI), (challenge, sign(challenge, r_sk))) then
+      let confirmed = checkmac(tag, kdf(sharedSecret, transcript((helloR, signatureI), (challenge, sign(challenge, r_sk))))) in
+      if thR = confirmed then
+        event SuiteAgreedR(sidR, KEM768, SIG65);
+        event AcceptedR(sidR, kdf(sharedSecret, transcript((helloR, signatureI), (challenge, sign(challenge, r_sk)))), KEM768, SIG65).
 
-query sid:bitstring, key:bitstring; event(AcceptedI(sid, key)) ==> event(Responded(sid)).
-query sid:bitstring, key:bitstring; event(AcceptedR(sid, key)) ==> event(Initiated(sid)).
-(* Session-key secrecy is checked with the observational-equivalence model in
-   formal/secrecy_equivalence.pv. ProVerif correspondence syntax cannot attach
-   a conditional attacker query to a newly generated session key. *)
-
-process (!Initiator | !Responder)
+query sid:bitstring, key:bitstring, kem:bitstring, sig:bitstring;
+  inj-event(AcceptedI(sid, key, kem, sig)) ==> inj-event(ResponderStarted(sid)).
+query sid:bitstring, key:bitstring, kem:bitstring, sig:bitstring;
+  inj-event(AcceptedR(sid, key, kem, sig)) ==> inj-event(InitiatorStarted(sid)).
+query sid:bitstring, kem:bitstring, sig:bitstring;
+  event(SuiteAgreedR(sid, kem, sig)) ==> event(SuiteAgreedI(sid, kem, sig)).
+query pid:bitstring, sid:bitstring, nonce:bitstring;
+  event(ReplayClaimed(pid, sid, nonce)) ==> event(HelloSent(pid, sid, nonce)).
+process new cache:channel; out(cache, 0) | !Initiator | !Responder(cache)

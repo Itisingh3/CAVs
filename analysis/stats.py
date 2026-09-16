@@ -8,6 +8,11 @@ from collections import defaultdict
 from pathlib import Path
 from statistics import fmean, stdev
 
+try:
+    from scipy.stats import t as student_t
+except ImportError:  # Keep the base analysis path lightweight.
+    student_t = None
+
 
 def mean_ci95(values: list[float]) -> tuple[float, float]:
     if not values: raise ValueError("no values")
@@ -46,7 +51,7 @@ def aggregate(input_dir: Path, output_dir: Path) -> tuple[Path, Path]:
             for metric, values in sorted(metrics.items()):
                 mean, ci = mean_ci95(values); writer.writerow({"variant":variant,"density":density,"metric":metric,"n_seeds":len(values),"mean":mean,"ci95":ci})
     with paired_target.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["density","metric","n_pairs","baseline_mean","ml_mean","ml_minus_baseline","difference_ci95","cohen_dz","paired_t_statistic"]); writer.writeheader()
+        writer = csv.DictWriter(handle, fieldnames=["density","metric","n_pairs","baseline_mean","ml_mean","ml_minus_baseline","difference_ci95","cohen_dz","paired_t_statistic","paired_t_p_value"]); writer.writeheader()
         densities = sorted({density for _, density, _ in runs})
         for density in densities:
             baseline_seeds = {seed for variant, d, seed in runs if variant == "baseline" and d == density}
@@ -57,7 +62,8 @@ def aggregate(input_dir: Path, output_dir: Path) -> tuple[Path, Path]:
                 if not baseline: continue
                 differences = [m - b for b, m in zip(baseline, ml)]; delta, ci = mean_ci95(differences)
                 t = 0.0 if len(differences) < 2 or stdev(differences) == 0 else delta / (stdev(differences) / math.sqrt(len(differences)))
-                writer.writerow({"density":density,"metric":metric,"n_pairs":len(seeds),"baseline_mean":fmean(baseline),"ml_mean":fmean(ml),"ml_minus_baseline":delta,"difference_ci95":ci,"cohen_dz":_cohen_dz(differences),"paired_t_statistic":t})
+                p_value = 1.0 if t == 0.0 else (2 * float(student_t.sf(abs(t), len(differences) - 1)) if student_t is not None and len(differences) > 1 else "unavailable_without_scipy")
+                writer.writerow({"density":density,"metric":metric,"n_pairs":len(seeds),"baseline_mean":fmean(baseline),"ml_mean":fmean(ml),"ml_minus_baseline":delta,"difference_ci95":ci,"cohen_dz":_cohen_dz(differences),"paired_t_statistic":t,"paired_t_p_value":p_value})
     return target, paired_target
 
 

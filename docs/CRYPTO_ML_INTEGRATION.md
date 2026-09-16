@@ -22,3 +22,10 @@ back to static AGS-PBFT and logs the reason.
 ProVerif models the registration/AKE protocol under symbolic assumptions.
 Empirical ML results assess reliability and grouping only; neither substitutes
 for the other.
+
+`ml.secure_grouping_pipeline.SecureTemporalGroupingPipeline` is the runtime
+composition: register an `AuthenticatedTelemetryContext` only after AKE,
+collect `NetworkTelemetry`, call `group`, then call
+`record_consensus_outcome` after the round. It keeps temporal histories scoped
+to the session and passes only `P_ML` to `LearnedReliabilityScore` before
+`MLAdaptiveAGSPBFT` selects a group.
