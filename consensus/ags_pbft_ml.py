@@ -58,14 +58,31 @@ class MLAdaptiveAGSPBFT(AGSPBFTBaseline):
             self.events.append({"event": "ml_fallback", "round_id": round_id, "reason": "unfitted_learned_score"})
             super().reassign(round_id); self.request_count = 0; return
         try:
-            base = {node_id: item.base_features() for node_id, item in evidence.items()}
-            probabilities = {
-                node_id: self.reliability_score.predict(item, self.predictor.predict(base[node_id]))
-                for node_id, item in evidence.items()
-            }
-            decision = should_fallback(list(probabilities.values()), self.predictor.observations)
+            model_probabilities = {node_id: self.predictor.predict(item.base_features()) for node_id, item in evidence.items()}
         except (KeyError, ValueError):
-            probabilities, decision = {}, should_fallback([], self.predictor.observations)
+            model_probabilities = {}
+        self.reassign_with_temporal_probabilities(round_id, evidence, model_probabilities, load, observations=self.predictor.observations)
+
+    def reassign_with_temporal_probabilities(self, round_id: str, evidence: dict[str, TemporalEvidence], model_probabilities: dict[str, float], load: float, *, observations: int, sequence_available: bool = True) -> None:
+        """Deploy a pre-selected temporal model through the learned score.
+
+        ``model_probabilities`` is ``P(reliable | X(t-K+1:t))`` from an
+        adapter; it is not a consensus decision. Missing history/model output
+        is explicit fallback, never a silent replacement with a hard label.
+        """
+        if self.reliability_score is None or not self.reliability_score.fitted:
+            self.events.append({"event": "ml_fallback", "round_id": round_id, "reason": "unfitted_learned_score"})
+            super().reassign(round_id); self.request_count = 0; return
+        if not sequence_available:
+            self.events.append({"event": "ml_fallback", "round_id": round_id, "reason": "sequence_unavailable"})
+            super().reassign(round_id); self.request_count = 0; return
+        try:
+            base = {node_id: item.base_features() for node_id, item in evidence.items()}
+            if set(evidence) != set(self.nodes) or set(model_probabilities) != set(self.nodes): raise ValueError("missing node evidence or probability")
+            probabilities = {node_id: self.reliability_score.predict(item, model_probabilities[node_id]) for node_id, item in evidence.items()}
+            decision = should_fallback(list(probabilities.values()), observations)
+        except (KeyError, ValueError):
+            probabilities, decision = {}, should_fallback([], observations)
         if decision.use_static:
             self.events.append({"event": "ml_fallback", "round_id": round_id, "reason": decision.reason})
             super().reassign(round_id); self.request_count = 0; return

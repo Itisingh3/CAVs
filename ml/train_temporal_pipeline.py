@@ -102,7 +102,16 @@ def _yaml_config(path: Path | None) -> dict[str, Any]:
 
 def _fit_base(rows: list[Window], name: str):
     predictor = create_predictor(name)
-    for row in rows:
+    # The deliberately dependency-free tree implementations are bounded online
+    # controls.  Fitting every historical row repeatedly is quadratic and does
+    # not scale to an exported telemetry trace, so use a deterministic, evenly
+    # spaced reservoir for their final bounded retrain.
+    fit_rows = rows
+    if name in {"decision_tree", "random_forest"} and len(rows) > 256:
+        step = len(rows) / 256
+        fit_rows = [rows[min(len(rows) - 1, int(index * step))] for index in range(256)]
+        predictor.retrain_every = len(fit_rows)  # type: ignore[attr-defined]
+    for row in fit_rows:
         predictor.update(row.evidence.base_features(), row.reliable)
     return predictor
 
@@ -125,6 +134,16 @@ def train_and_select(rows: list[Window]) -> tuple[str, object, LearnedReliabilit
     ]
     scorer = LearnedReliabilityScore().fit(calibration_rows)
     return winner, predictor, scorer, comparison
+
+
+def train_classical_candidate(rows: list[Window], name: str) -> tuple[object, LearnedReliabilityScore, PredictorMetrics]:
+    """Fit one pre-selected classical candidate; test data remains untouched."""
+    train, validation = [row for row in rows if row.split == "train"], [row for row in rows if row.split == "validation"]
+    if not train or not validation: raise ValueError("non-empty train and validation trace groups are required")
+    predictor = _fit_base(train, name)
+    probabilities = [predictor.predict(row.evidence.base_features()) for row in validation]
+    scorer = LearnedReliabilityScore().fit([(row.evidence, probability, row.reliable) for row, probability in zip(validation, probabilities)])
+    return predictor, scorer, metrics([row.reliable for row in validation], probabilities)
 
 
 def evaluate_locked_test(rows: list[Window], predictor: object, scorer: LearnedReliabilityScore) -> PredictorMetrics:
@@ -181,6 +200,12 @@ def main() -> None:
             test = metrics(test_labels, model.predict_sequences(test_samples))
         write_report(args.output, args.model, {args.model: validation}, LearnedReliabilityScore(), test)
         print(f"validation_model={args.model}\nsequence_shape=[samples, {args.sequence_length or dataset.get('sequence_length', 20)}, 10]\ntraining_seconds={elapsed:.3f}\nparameters={model.parameter_count}\nreport={args.output}")
+        return
+    if args.model in {"logistic_regression", "decision_tree", "random_forest", "mlp"}:
+        predictor, scorer, validation = train_classical_candidate(rows, args.model)
+        test = evaluate_locked_test(rows, predictor, scorer) if args.evaluate_locked_test else None
+        write_report(args.output, args.model, {args.model: validation}, scorer, test)
+        print(f"validation_model={args.model}\nreport={args.output}")
         return
     winner, predictor, scorer, comparison = train_and_select(rows)
     test = evaluate_locked_test(rows, predictor, scorer) if args.evaluate_locked_test else None
