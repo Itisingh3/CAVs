@@ -19,7 +19,9 @@ def _timestamp(now: int | None) -> int: return int(time.time()) if now is None e
 def _check_fresh(ts: int, now: int, freshness_s: int):
     if not isinstance(ts, int) or abs(now - ts) > freshness_s: raise AKEError("stale message")
 def _sig_message(payload: dict[str, Any]) -> bytes: return canonical(payload)
-def _transcript(hello: dict[str, Any], challenge: dict[str, Any]) -> bytes: return sha3(canonical(hello) + canonical(challenge))
+def _transcript(hello: dict[str, Any], hello_signature: bytes, challenge: dict[str, Any], challenge_signature: bytes) -> bytes:
+    """Bind both authenticated payloads and their signatures to key confirmation."""
+    return sha3(canonical(hello) + hello_signature + canonical(challenge) + challenge_signature)
 def _session_key(shared_secret: bytes, th: bytes) -> bytes: return sha3(b"CAV-AKE-v1" + shared_secret + th)
 
 
@@ -65,7 +67,8 @@ class Initiator:
             cred = validate_credential(challenge["credential"], self.ta_public_key, self.suite.signature, now)
             if not self.suite.signature.verify(unb64(cred.body["entity_sig_pk"]), _sig_message(challenge), signature): raise AKEError("invalid responder signature")
             secret = self.suite.kem.decapsulate(state.ephemeral_secret_key, unb64(challenge["ciphertext"]))
-            th, key = _transcript(state.hello, challenge), _session_key(secret, _transcript(state.hello, challenge))
+            th = _transcript(state.hello, state.hello_signature, challenge, signature)
+            key = _session_key(secret, th)
             confirm = {"domain":"CAV-AKE-v1","type":"CONFIRM","sid":state.session_id,"th":b64(th),"tag":b64(hmac.new(key, b"initiator-confirm" + th, hashlib.sha3_256).digest()), **self.suite.algorithm_ids}
             return key, {"payload":confirm,"signature":b64(self.suite.signature.sign(self.signing_secret_key, _sig_message(confirm)))}
         finally:
@@ -77,6 +80,7 @@ class ResponderState:
     hello: dict[str, Any]
     hello_signature: bytes
     challenge: dict[str, Any]
+    challenge_signature: bytes
     shared_secret: bytes
     initiator_public_key: bytes
 
@@ -99,7 +103,7 @@ class Responder:
             ciphertext, shared_secret = self.suite.kem.encapsulate(unb64(hello["pk_i"]))
             challenge = {"domain":"CAV-AKE-v1","type":"CHALLENGE","sid":hello["sid"],"nonce_i":hello["nonce_i"],"nonce_r":secrets.token_urlsafe(18),"ts":now,"ciphertext":b64(ciphertext),"credential":self.credential,**self.suite.algorithm_ids}
             challenge_sig = self.suite.signature.sign(self.signing_secret_key, _sig_message(challenge))
-            return ResponderState(hello, signature, challenge, shared_secret, unb64(cred.body["entity_sig_pk"])), {"payload":challenge,"signature":b64(challenge_sig)}
+            return ResponderState(hello, signature, challenge, challenge_sig, shared_secret, unb64(cred.body["entity_sig_pk"])), {"payload":challenge,"signature":b64(challenge_sig)}
         except (CredentialError, KeyError, TypeError, ValueError) as exc:
             if isinstance(exc, AKEError): raise
             raise AKEError("malformed HELLO") from exc
@@ -110,7 +114,8 @@ class Responder:
             if confirm.get("domain") != "CAV-AKE-v1" or confirm.get("type") != "CONFIRM" or confirm.get("sid") != state.hello["sid"]: raise AKEError("invalid confirmation")
             if confirm.get("kem_alg") != self.suite.kem.algorithm_id or confirm.get("sig_alg") != self.suite.signature.algorithm_id: raise AKEError("suite mismatch")
             if not self.suite.signature.verify(state.initiator_public_key, _sig_message(confirm), signature): raise AKEError("invalid confirmation signature")
-            th, key = _transcript(state.hello, state.challenge), _session_key(state.shared_secret, _transcript(state.hello, state.challenge))
+            th = _transcript(state.hello, state.hello_signature, state.challenge, state.challenge_signature)
+            key = _session_key(state.shared_secret, th)
             if not hmac.compare_digest(unb64(confirm["th"]), th) or not hmac.compare_digest(unb64(confirm["tag"]), hmac.new(key, b"initiator-confirm" + th, hashlib.sha3_256).digest()): raise AKEError("key confirmation failed")
             return key
         finally:

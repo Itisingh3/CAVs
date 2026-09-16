@@ -36,7 +36,7 @@ let Initiator =
   in(c, (challenge:bitstring, rsig:bitstring));
   let (=challenge_tag, =sid, =ni, nr:bitstring, ct:bitstring, credR:bitstring, =KEM768, =SIG65) = checksign(rsig, pk(r_sk)) in
   let (=credential_tag, =pk(r_sk), =SIG65) = checksign(credR, pk(ta_sk)) in
-  let th = transcript(hello, challenge) in
+  let th = transcript((hello, sign(hello, i_sk)), (challenge, rsig)) in
   let key = kdf(kemdec(ct, esk), th) in
   let confirm = (confirm_tag, sid, th, KEM768, SIG65, mac(th, key)) in
   event SuiteAgreedI(sid, KEM768, SIG65);
@@ -55,11 +55,11 @@ let Responder =
   out(c, (challenge, sign(challenge, r_sk)));
   in(c, (confirm:bitstring, csig:bitstring));
   let (=confirm_tag, =sid, th:bitstring, =KEM768, =SIG65, tag:bitstring) = checksign(csig, pk(i_sk)) in
-  if th = transcript(hello, challenge) then
-    let confirmed_th = checkmac(tag, kdf(ss, transcript(hello, challenge))) in
+  if th = transcript((hello, isig), (challenge, sign(challenge, r_sk))) then
+    let confirmed_th = checkmac(tag, kdf(ss, transcript((hello, isig), (challenge, sign(challenge, r_sk))))) in
     if th = confirmed_th then
       event SuiteAgreedR(sid, KEM768, SIG65);
-      event AcceptedR(sid, kdf(ss, transcript(hello, challenge)), KEM768, SIG65).
+      event AcceptedR(sid, kdf(ss, transcript((hello, isig), (challenge, sign(challenge, r_sk)))), KEM768, SIG65).
 
 let ConsensusVote =
   new view:bitstring; new sequence:bitstring; new digest:bitstring;

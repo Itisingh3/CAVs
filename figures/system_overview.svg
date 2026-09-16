@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1160" viewBox="0 0 1600 1160" role="img" aria-labelledby="title desc">
+  <title id="title">Crypto-agile ML-adaptive AGS-PBFT system overview</title>
+  <desc id="desc">Three panels show the CAV system architecture, the signed ML-KEM and ML-DSA authenticated key establishment, and confidence-guarded ML adaptive PBFT grouping.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#3f4850"/></marker>
+    <marker id="blueArrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#3856a8"/></marker>
+    <marker id="greenArrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#147a63"/></marker>
+    <style>
+      .h{font:700 25px Arial,sans-serif;fill:#151a1f}.sh{font:700 20px Arial,sans-serif;fill:#151a1f}.t{font:16px Arial,sans-serif;fill:#232931}.s{font:14px Arial,sans-serif;fill:#303840}.tiny{font:13px Arial,sans-serif;fill:#303840}.note{font:italic 14px Arial,sans-serif;fill:#646e78}.box{stroke-width:2}.line{stroke:#3f4850;stroke-width:2;fill:none;marker-end:url(#arrow)}.dashBlue{stroke:#3856a8;stroke-width:2.5;stroke-dasharray:8 5;fill:none;marker-end:url(#blueArrow)}.dashGreen{stroke:#147a63;stroke-width:2.5;stroke-dasharray:8 5;fill:none;marker-end:url(#greenArrow)}
+    </style>
+  </defs>
+  <rect width="1600" height="920" fill="white"/>
+
+  <text x="28" y="38" class="h">(a) System architecture</text>
+  <rect x="55" y="60" width="1490" height="64" rx="10" fill="#f1f0eb" stroke="#777" class="box"/>
+  <text x="78" y="89" class="sh">CAV / user layer</text><text x="78" y="112" class="t">OBUs; V2V/V2I message exchange; mobility</text>
+  <path d="M800 124V145" class="line"/>
+  <rect x="55" y="145" width="1490" height="78" rx="10" fill="#ecebff" stroke="#5149a6" class="box"/>
+  <text x="78" y="176" class="sh">Crypto-agile security layer</text><text x="78" y="202" class="t">TA-issued ML-DSA-65 credentials  |  ML-KEM-768 ephemeral AKE  |  nonce, timestamp, replay cache</text>
+  <path d="M800 223V244" class="line"/>
+  <rect x="55" y="244" width="1490" height="78" rx="10" fill="#e2f5ee" stroke="#147a63" class="box"/>
+  <text x="78" y="275" class="sh">MEC / consensus layer</text><text x="78" y="301" class="t">ML-adaptive AGS-PBFT; reliability predictor; confidence guard; signed votes; n ≥ 3f+1</text>
+  <path d="M800 322V343" class="line"/>
+  <rect x="55" y="343" width="1490" height="64" rx="10" fill="#fff2db" stroke="#a76818" class="box"/>
+  <text x="78" y="372" class="sh">Verification and evaluation layer</text><text x="78" y="395" class="t">ProVerif symbolic checks  |  seed-separated train/validation/test evaluation</text>
+  <path d="M445 223 C405 275,405 360,430 432" class="dashBlue"/><text x="145" y="433" class="note">detailed in (b)</text>
+  <path d="M1135 322 C1175 365,1175 390,1145 432" class="dashGreen"/><text x="1210" y="433" class="note">detailed in (c)</text>
+
+  <text x="28" y="468" class="h">(b) Registration and signed authenticated key establishment</text>
+  <rect x="80" y="487" width="250" height="35" rx="18" fill="#ecebff" stroke="#5149a6" class="box"/><text x="162" y="511" class="sh">TA</text>
+  <rect x="675" y="487" width="250" height="35" rx="18" fill="#ecebff" stroke="#5149a6" class="box"/><text x="732" y="511" class="sh">CAV / initiator</text>
+  <rect x="1240" y="487" width="250" height="35" rx="18" fill="#ecebff" stroke="#5149a6" class="box"/><text x="1293" y="511" class="sh">RSU / responder</text>
+  <path d="M205 522V760M800 522V760M1365 522V760" stroke="#9aa1a8" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <path d="M205 552H800" class="line"/><text x="292" y="543" class="tiny">Credential = {pid, pk_sig, issued/expiry, nonce}, σ_TA = Sign(sk_TA, ·)</text>
+  <path d="M800 598H1365" class="line"/><text x="832" y="588" class="tiny">HELLO: sid, n_I, ts, pk_I (fresh), cred_I, σ_I = Sign(sk_I,m_1)</text>
+  <rect x="1175" y="616" width="315" height="52" rx="9" fill="#f1f0eb" stroke="#777" class="box"/><text x="1200" y="639" class="tiny">Validate credential, suite, freshness,</text><text x="1200" y="658" class="tiny">replay cache, σ_I; then Encap(pk_I,ss)</text>
+  <path d="M1365 693H800" class="line"/><text x="834" y="684" class="tiny">CHALLENGE: sid, n_I, n_R, ct, cred_R, σ_R = Sign(sk_R,m_2)</text>
+  <path d="M800 735H1365" class="line"/><text x="834" y="726" class="tiny">CONFIRM: th, HMAC(K_s, confirm || th), σ'_I = Sign(sk_I,m_3)</text>
+  <rect x="65" y="775" width="1470" height="48" rx="10" fill="#f7f7f7" stroke="#777" class="box"/>
+  <text x="125" y="805" class="t">Accept only after signature, transcript, and HMAC checks.  K_s = H("CAV-AKE-v1" || ss || th); erase ephemeral KEM material.  Failed checks abort.</text>
+
+  <text x="28" y="862" class="h">(c) ML-adaptive AGS-PBFT grouping with confidence-guarded static fallback</text>
+  <rect x="120" y="882" width="1360" height="47" rx="10" fill="#f1f0eb" stroke="#777" class="box"/>
+  <text x="270" y="911" class="t">Per-window observations: agreement outcome · RTT · PDR · link quality/mobility · score trend · fault history</text>
+  <path d="M800 929V954" class="line"/>
+  <rect x="300" y="954" width="1000" height="48" rx="10" fill="#e2f5ee" stroke="#147a63" class="box"/>
+  <text x="390" y="984" class="t">x_i = [agreement rate, normalized RTT, PDR, link quality, score trend, fault rate] ∈ [0,1]^6</text>
+  <path d="M800 1002V1026" class="line"/>
+  <rect x="335" y="1026" width="930" height="54" rx="10" fill="#ecebff" stroke="#5149a6" class="box"/>
+  <text x="500" y="1050" class="t">Reliability predictor: p_i = P(node i reliable | x_i)</text><text x="490" y="1070" class="tiny">chosen on validation data from logistic regression / decision tree / random forest / MLP</text>
+  <path d="M800 1080V1102" class="line"/>
+  <rect x="325" y="1102" width="950" height="46" rx="10" fill="#fff2db" stroke="#a76818" class="box"/>
+  <text x="440" y="1131" class="t">PBFT-safe decision: rank by p_i; estimate congestion from RTT/PDR; enforce n ≥ 3f+1</text>
+  <path d="M325 1125 C215 1125,205 1055,300 1055" stroke="#b52d2d" stroke-width="2.5" stroke-dasharray="7 5" fill="none" marker-end="url(#arrow)"/>
+  <text x="55" y="1050" class="tiny" fill="#b52d2d">Fallback if &lt;10 labels, invalid input,</text><text x="55" y="1068" class="tiny" fill="#b52d2d">or confidence &lt;0.20: log and use static μ±σ policy</text>
+</svg>
