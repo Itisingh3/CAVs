@@ -3,7 +3,7 @@ import csv
 import tempfile
 from pathlib import Path
 
-from ml.train_temporal_pipeline import read_windows, train_and_select, evaluate_locked_test
+from ml.train_temporal_pipeline import read_windows, train_and_select, evaluate_locked_test, write_report
 from ml.temporal_reliability import LearnedReliabilityScore, TemporalEvidence
 
 
@@ -42,3 +42,6 @@ class TemporalReliabilityTests(unittest.TestCase):
             self.assertIn(winner, report)
             self.assertTrue(scorer.fitted)
             self.assertGreaterEqual(evaluate_locked_test(rows, predictor, scorer).accuracy, 0.0)
+            output = Path(directory) / "report.csv"
+            write_report(output, winner, report, scorer, None)
+            self.assertIn("true_positive", output.read_text(encoding="utf-8"))

@@ -7,8 +7,34 @@ This repository is the reproducible reference implementation accompanying the pl
 - Default suite: ML-KEM-768 plus ML-DSA-65 through Open Quantum Safe (`liboqs-python`).
 - Saber is deliberately not enabled: it is an experimental backend and must be added only through a maintained PQClean/liboqs binding.
 - The bundled development harness is not a SUMO/Veins/OMNeT++ simulation and is not reported as a networking experiment.
-- The reliability implementation separates an ML probability from learned historical, consensus, and network evidence. The coefficients are fitted on validation data, never hand-selected.
+- The reliability implementation separates an ML probability from learned historical, consensus, and network evidence. The coefficients are fitted on validation data, never hand-selected. Cryptographic failures remain authoritative and cannot be overridden by ML.
 - The selected public source is ROAD, a real-vehicle CAN intrusion dataset. It trains only the automotive intrusion-probability branch; it is not represented as V2X or PBFT data. See `data/README.md`.
+
+## Temporal-model experiment
+
+The four existing lightweight predictors remain available for the online
+grouping path. LSTM, GRU and BiLSTM are separate optional offline models:
+they are trained on genuine causal tensors of shape
+`[samples, sequence_length, 10]`, not renamed single rows. Each tensor ends at
+the decision time `t`; it never includes observations after `t`, and does not
+cross scenario/node or split boundaries. The experimental question is:
+
+> Does temporal modelling improve reliability-aware dynamic grouping compared
+> with non-temporal models?
+
+Install the optional deep-learning stack and use the CPU smoke configuration
+before a full GPU/Colab run:
+
+```powershell
+pip install -r requirements-deep.txt
+python -m ml.train data/derived/cav_reliability_windows.csv --model lstm --epochs 5 --sequence-length 10 --batch-size 32 --output results/lstm_smoke.csv
+python -m ml.train data/derived/cav_reliability_windows.csv --model bilstm --epochs 50 --sequence-length 20 --batch-size 64 --device cuda --output results/bilstm.csv --evaluate-locked-test
+```
+
+Defaults live in `configs/ml_training.yaml` (50 epochs, 20 windows, batch size
+64, learning rate 0.001, patience 8, seed 42). Command-line arguments override
+them. BiLSTM is an offline comparison model; all deployment decisions still use
+only observations available through `t`.
 
 ## Hardware-aware setup
 
